@@ -227,11 +227,13 @@ with left:
     cp, cl = st.columns(2)
     with cp:
         pp = min(1.0, max(0,stats["pnl"])/daily_goal) if daily_goal>0 else 0
-        st.markdown(f"**Meta: ${max(0,stats['pnl']):.2f} / ${daily_goal:.2f}**")
+        pnl_val = max(0, stats["pnl"])
+        st.markdown(f"**Meta: {pnl_val:.2f} USD / {daily_goal:.2f} USD**")
         st.progress(pp)
     with cl:
         lp = min(1.0, abs(min(0,stats["pnl"]))/max_loss) if max_loss>0 else 0
-        st.markdown(f"**Stop: ${abs(min(0,stats['pnl'])):.2f} / ${max_loss:.2f}**")
+        loss_val = abs(min(0, stats["pnl"]))
+        st.markdown(f"**Stop: {loss_val:.2f} USD / {max_loss:.2f} USD**")
         st.progress(lp)
 
 with right:
@@ -251,7 +253,9 @@ with right:
     logs = redis_lrange("bot:logs", 0, 11)
     html = ""
     for e in logs:
-        e = str(e)
+        # limpa lista ou string
+        if isinstance(e, list): e = e[0] if e else ""
+        e = str(e).strip("[]'"")
         cor = "#00d4aa" if "✅" in e else ("#ff4d6d" if "❌" in e or "💥" in e else "#7c9cbf")
         html += f'<div style="font-family:JetBrains Mono,monospace;font-size:.74rem;color:{cor};padding:2px 0">{e}</div>'
     st.markdown(f'<div style="background:#111827;border-radius:8px;padding:12px;max-height:260px;overflow-y:auto">{html}</div>',
