@@ -19,12 +19,13 @@ REDIS_URL   = os.environ.get("UPSTASH_REDIS_REST_URL","").strip()
 REDIS_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN","").strip()
 
 def redis_set(key: str, value, ex: int = None):
+    # Upstash REST API: POST /set/key/value — valor vai directo na URL
     data = json.dumps(value) if not isinstance(value, str) else value
     headers = {"Authorization": f"Bearer {REDIS_TOKEN}"}
-    body = {"value": data}
-    if ex: body["ex"] = ex
     try:
-        httpx.post(f"{REDIS_URL}/set/{key}", headers=headers, json=body, timeout=5)
+        url = f"{REDIS_URL}/set/{key}/{data}"
+        if ex: url += f"/ex/{ex}"
+        httpx.post(url, headers=headers, timeout=5)
     except: pass
 
 def redis_get(key: str):
@@ -254,9 +255,8 @@ with right:
     html = ""
     for e in logs:
         # limpa lista ou string
-        if isinstance(e, list):
-            e = e[0] if e else ""
-        e = str(e).strip("[]'\"")
+        if isinstance(e, list): e = e[0] if e else ""
+        e = str(e).strip("[]'"")
         cor = "#00d4aa" if "✅" in e else ("#ff4d6d" if "❌" in e or "💥" in e else "#7c9cbf")
         html += f'<div style="font-family:JetBrains Mono,monospace;font-size:.74rem;color:{cor};padding:2px 0">{e}</div>'
     st.markdown(f'<div style="background:#111827;border-radius:8px;padding:12px;max-height:260px;overflow-y:auto">{html}</div>',
