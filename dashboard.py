@@ -256,7 +256,7 @@ with right:
     for e in logs:
         # limpa lista ou string
         if isinstance(e, list): e = e[0] if e else ""
-        e = str(e).strip("[]'"")
+        e = str(e).strip("[]\'\"")
         cor = "#00d4aa" if "✅" in e else ("#ff4d6d" if "❌" in e or "💥" in e else "#7c9cbf")
         html += f'<div style="font-family:JetBrains Mono,monospace;font-size:.74rem;color:{cor};padding:2px 0">{e}</div>'
     st.markdown(f'<div style="background:#111827;border-radius:8px;padding:12px;max-height:260px;overflow-y:auto">{html}</div>',
